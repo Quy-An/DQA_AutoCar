@@ -128,14 +128,14 @@ class Driver:
         self._bus.close()
 
 
-# Ví dụ sử dụng
+# Example usage
 if __name__ == "__main__":
     with Driver() as l9110:
-        # Điều khiển servo S1 đến góc 90 độ
+        # control servo S1 to 90 degrees
         l9110.control_rc(rc_motor=l9110.S1, degree=90)
 
-        # Điều khiển động cơ MA chạy 75% tốc độ, chiều CW
-        l9110.control_dc(l9110.MA, 0,l9110.CW)
+        # control DC motor MA to 50% speed clockwise
+        l9110.control_dc(l9110.MA, 50,l9110.CW)
 
-        # Điều khiển động cơ MB dừng (0%), chiều CCW
-        l9110.control_dc(l9110.MB, 0, l9110.CCW)
+        # control DC motor MB to 50% speed counter-clockwise
+        l9110.control_dc(l9110.MB, 50, l9110.CCW)
