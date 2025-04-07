@@ -135,7 +135,7 @@ if __name__ == "__main__":
         l9110.control_rc(l9110.S1, 90)
 
         # control DC motor MA to 50% speed clockwise
-        l9110.control_dc(l9110.MA, 50,l9110.CW)
+        l9110.control_dc(l9110.MA, 0,l9110.CW)
 
         # control DC motor MB to 50% speed counter-clockwise
-        l9110.control_dc(l9110.MB, 50, l9110.CCW)
+        l9110.control_dc(l9110.MB, 0, l9110.CCW)
