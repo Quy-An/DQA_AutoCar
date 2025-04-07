@@ -57,8 +57,15 @@ class Mode:
 
 
 class INA219:
-    def __init__(self, i2c_bus=1, addr=0x40):
-        self.bus = smbus.SMBus(i2c_bus);
+    def __init__(self, i2c_bus=1, addr=0x41):
+        """
+        Initialize INA219 chip at given I2C address on given bus.
+
+        Parameters:
+            i2c_bus (int): The I2C bus number to use. Defaults to 1.
+            addr (int): The I2C address of the chip. Defaults to 0x41.
+        """
+        self.bus = smbus.SMBus(i2c_bus)
         self.addr = addr
 
         # Set chip to known config values to start
@@ -69,10 +76,26 @@ class INA219:
         self.set_calibration_16V_5A()
 
     def read(self,address):
+        """
+        Reads 16-bit data from INA219 chip at given address.
+        
+        Parameters:
+            address (int): The address of the register to read from.
+        
+        Returns:
+            int: The 16-bit value read from the chip.
+        """
         data = self.bus.read_i2c_block_data(self.addr, address, 2)
         return ((data[0] * 256 ) + data[1])
 
     def write(self,address,data):
+        """
+        Writes 16-bit data to INA219 chip at given address.
+        
+        Parameters:
+            address (int): The address of the register to write to.
+            data (int): The 16-bit value to write to the chip.
+        """
         temp = [0,0]
         temp[1] = data & 0xFF
         temp[0] =(data & 0xFF00) >> 8
@@ -251,6 +274,12 @@ class INA219:
                       self.mode
         self.write(_REG_CONFIG,self.config)
     def getShuntVoltage_mV(self):
+        """
+        Returns the shunt voltage measured across the shunt resistor.
+
+        Returns:
+            float: The shunt voltage in millivolts.
+        """
         self.write(_REG_CALIBRATION,self._cal_value)
         value = self.read(_REG_SHUNTVOLTAGE)
         if value > 32767:
@@ -258,17 +287,44 @@ class INA219:
         return value * 0.01
 
     def getBusVoltage_V(self):
+        """
+        Returns the bus voltage measured across the high side of the shunt
+        resistor.
+
+        Returns:
+            float: The bus voltage in volts.
+        """
         self.write(_REG_CALIBRATION,self._cal_value)
         self.read(_REG_BUSVOLTAGE)
         return (self.read(_REG_BUSVOLTAGE) >> 3) * 0.004
 
     def getCurrent_mA(self):
+    """
+    Returns the current flowing through the shunt resistor.
+
+    The current is read from the CURRENT register, adjusted for overflow,
+    and scaled by the current LSB value.
+
+    Returns:
+        float: The current in milliamperes (mA).
+    """
+
         value = self.read(_REG_CURRENT)
         if value > 32767:
             value -= 65535
         return value * self._current_lsb
 
     def getPower_W(self):
+        """
+        Returns the calculated power in watts (W) based on the
+        previously read shunt voltage and bus voltage.
+
+        The power is read from the POWER register, adjusted for
+        overflow, and scaled by the power LSB value.
+
+        Returns:
+            float: The power in watts (W).
+        """
         self.write(_REG_CALIBRATION,self._cal_value)
         value = self.read(_REG_POWER)
         if value > 32767:

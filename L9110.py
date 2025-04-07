@@ -102,6 +102,37 @@ class Driver:
         command_data[5] = sum(command_data) & 0xFF  # 8-bit checksum
 
         self.send_i2c_command(command_data)
+        
+    def stop(self):
+        """Stop the car by setting both motor speeds to 0 and the direction to CW."""
+        self.control_dc(self.MA, 0, self.CW)
+        self.control_dc(self.MB, 0, self.CW)
+
+    def run_forward(self):
+        """Run the car forward by setting both motor speeds to 100 and the direction to CCW."""
+
+        self.control_dc(self.MA, 100, self.CCW)
+        self.control_dc(self.MB, 100, self.CCW)
+
+    def run_backward(self):
+    """
+    Run the car backward by setting both motor speeds to 100 and the direction to CW.
+
+    :return: None
+    """
+
+        self.l9110.control_dc(self.l9110.MA, 100, self.l9110.CW)
+        self.l9110.control_dc(self.l9110.MB, 100, self.l9110.CW)
+
+    def turn_left(self):
+        """Turn the car left by setting MA to 100% speed CW and MB to 100% speed CCW."""
+        self.control_dc(self.MA, 100, self.CW)
+        self.control_dc(self.MB, 100, self.CCW)
+
+    def turn_right(self):
+        """Turn the car right by setting MA to 100% speed CCW and MB to 100% speed CW."""
+        self.control_dc(self.MA, 100, self.CCW)
+        self.control_dc(self.MB, 100, self.CW)
 
     def set_address(self, new_address):
         """
@@ -131,11 +162,17 @@ class Driver:
 # Example usage
 if __name__ == "__main__":
     with Driver() as l9110:
-        # control servo S1 to 90 degrees
-        l9110.control_rc(l9110.S1, 90)
-
-        # control DC motor MA to 50% speed clockwise
-        l9110.control_dc(l9110.MA, 0,l9110.CW)
-
-        # control DC motor MB to 50% speed counter-clockwise
-        l9110.control_dc(l9110.MB, 0, l9110.CCW)
+        # Run the car forward
+        l9110.run_forward()
+        
+        # Stop the car
+        l9110.stop()
+        
+        # Turn the car left
+        l9110.turn_left()
+        
+        # Turn the car right
+        l9110.turn_right()
+        
+        # Run the car backward
+        l9110.run_backward()
