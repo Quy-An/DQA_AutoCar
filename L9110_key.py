@@ -77,27 +77,30 @@ def stop():
 
 # run forward
 def run_forward():
-    l9110.control_dc(l9110.MA, 100, l9110.CW)
-    l9110.control_dc(l9110.MB, 100, l9110.CW)
-    
-# run backward
-def run_backward():
     l9110.control_dc(l9110.MA, 100, l9110.CCW)
     l9110.control_dc(l9110.MB, 100, l9110.CCW)
     
+# run backward
+def run_backward():
+    l9110.control_dc(l9110.MA, 100, l9110.CW)
+    l9110.control_dc(l9110.MB, 100, l9110.CW)
+    
 # turn left
 def turn_left():
-    l9110.control_dc(l9110.MA, 100, l9110.CCW)
-    l9110.control_dc(l9110.MB, 100, l9110.CW)
+    l9110.control_dc(l9110.MA, 100, l9110.CW)
+    l9110.control_dc(l9110.MB, 100, l9110.CCW)
 
 # turn right    
 def turn_right():
-    l9110.control_dc(l9110.MA, 100, l9110.CW)    
-    l9110.control_dc(l9110.MB, 100, l9110.CCW)  
+    l9110.control_dc(l9110.MA, 100, l9110.CCW)    
+    l9110.control_dc(l9110.MB, 100, l9110.CW)  
     
 # control servo 
 def control_servo(servo, angle):
     l9110.control_rc(servo, angle)
+    
+control_servo(l9110.S1, angle_S1)
+control_servo(l9110.S2, angle_S2)
 
 # start listener 
 listener = keyboard.Listener(on_press=on_press, on_release=on_release)
