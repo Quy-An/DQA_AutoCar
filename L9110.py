@@ -115,14 +115,14 @@ class Driver:
         self.control_dc(self.MB, 100, self.CCW)
 
     def run_backward(self):
-    """
-    Run the car backward by setting both motor speeds to 100 and the direction to CW.
+        """
+        Run the car backward by setting both motor speeds to 100 and the direction to CW.
 
-    :return: None
-    """
+        :return: None
+        """
 
-        self.l9110.control_dc(self.l9110.MA, 100, self.l9110.CW)
-        self.l9110.control_dc(self.l9110.MB, 100, self.l9110.CW)
+        self.control_dc(self.MA, 100, self.CW)
+        self.control_dc(self.MB, 100, self.CW)
 
     def turn_left(self):
         """Turn the car left by setting MA to 100% speed CW and MB to 100% speed CCW."""

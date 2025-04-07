@@ -86,8 +86,8 @@ class AutoCarController:
             return False
 
     def start(self):
-        self.l9110.control_servo(self.l9110.S1, self.angle_S1)
-        self.l9110.control_servo(self.l9110.S2, self.angle_S2)
+        self.l9110.control_rc(self.l9110.S1, self.angle_S1)
+        self.l9110.control_rc(self.l9110.S2, self.angle_S2)
         self.listener = keyboard.Listener(on_press=self.on_press, on_release=self.on_release)
         self.listener.start()
         print("start")
@@ -108,16 +108,16 @@ class AutoCarController:
                     self.l9110.turn_right()
                 elif self.i_pressed:
                     self.angle_S2 -= 1
-                    self.l9110.control_servo(self.l9110.S2, self.angle_S2)
+                    self.l9110.control_rc(self.l9110.S2, self.angle_S2)
                 elif self.k_pressed:
                     self.angle_S2 += 1
-                    self.l9110.control_servo(self.l9110.S2, self.angle_S2)
+                    self.l9110.control_rc(self.l9110.S2, self.angle_S2)
                 elif self.j_pressed:
                     self.angle_S1 += 1
-                    self.l9110.control_servo(self.l9110.S1, self.angle_S1)
+                    self.l9110.control_rc(self.l9110.S1, self.angle_S1)
                 elif self.l_pressed:
                     self.angle_S1 -= 1
-                    self.l9110.control_servo(self.l9110.S1, self.angle_S1)
+                    self.l9110.control_rc(self.l9110.S1, self.angle_S1)
                 else:
                     self.l9110.stop()
                 time.sleep(0.1)
