@@ -132,7 +132,7 @@ class Driver:
 if __name__ == "__main__":
     with Driver() as l9110:
         # control servo S1 to 90 degrees
-        l9110.control_rc(rc_motor=l9110.S1, degree=90)
+        l9110.control_rc(l9110.S1, 90)
 
         # control DC motor MA to 50% speed clockwise
         l9110.control_dc(l9110.MA, 50,l9110.CW)
