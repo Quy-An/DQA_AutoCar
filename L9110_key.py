@@ -124,10 +124,10 @@ while listener.is_alive():
     elif d_pressed:
         turn_right()
     elif i_pressed:
-        angle_S2 += 1
+        angle_S2 -= 1
         control_servo(l9110.S2, angle_S2)
     elif k_pressed:
-        angle_S2 -= 1
+        angle_S2 += 1
         control_servo(l9110.S2, angle_S2)
     elif j_pressed:
         angle_S1 += 1
