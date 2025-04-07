@@ -34,7 +34,7 @@ def on_press(key):
             l_pressed = True
     except AttributeError:
         pass
-
+    
 # key listener
 def on_release(key):
     global w_pressed, s_pressed, a_pressed, d_pressed, i_pressed, k_pressed, j_pressed, l_pressed
@@ -92,9 +92,7 @@ while listener.is_alive():
         print("S1 turn left")
     elif l_pressed:
         print("S1 turn right")
-    else:
-        print("stop")
-    time.sleep(0.1) 
+    time.sleep(0.1)
 
 # stop listener
 listener.join()
