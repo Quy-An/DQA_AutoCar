@@ -15,7 +15,6 @@ class CameraStreamer:
         :ivar pipeline_str: GStreamer pipeline string
         :ivar pipeline: GStreamer pipeline object
         :ivar loop: GStreamer main loop object
-        :ivar recording: Flag to indicate if recording is active
         """
         Gst.init(None)  # Initialize GStreamer
 
@@ -28,15 +27,15 @@ class CameraStreamer:
                 "videoflip method=vertical-flip ! "
                 "clockoverlay time-format=\"%D %H:%M:%S\" ! "
                 "tee name=t ! "
-                "queue ! autovideosink "
-                "t. ! queue ! x264enc tune=zerolatency ! mp4mux ! filesink location=recording.mp4"
+                "queue ! autovideosink "  # Branch for display
+                "t. ! queue ! x264enc tune=zerolatency ! mp4mux ! filesink name=filesink location=recording.mp4 "  # Branch for recording
+                "t. ! queue ! x264enc tune=zerolatency bitrate=500 ! rtph264pay ! udpsink host=IP_CUA_MAY_TINH port=5000"  # Branch for streaming
             )
         else:
             self.pipeline_str = pipeline_str
 
         self.pipeline = None
         self.loop = None
-        self.recording = False
         self.filesink = None
 
     def on_bus_message(self, bus, message, loop):
@@ -65,20 +64,24 @@ class CameraStreamer:
 
     def start_stream(self):
         """
-        Starts the camera stream.
+        Starts the camera stream and recording.
 
         This method starts the camera stream by creating a GStreamer pipeline,
         setting up a main loop to handle messages from the pipeline, and starting
-        the pipeline. If an error occurs, it is logged and the stream is stopped.
-        If the stream ends, it is also stopped.
+        the pipeline. Recording starts automatically with the stream.
 
         :return: None
         """
         try:
             self.pipeline = Gst.parse_launch(self.pipeline_str)
-            self.filesink = self.pipeline.get_by_name("filesink0")  # Get the filesink element
+            self.filesink = self.pipeline.get_by_name("filesink")  # Get the filesink element
             if self.filesink:
-                self.filesink.set_property("location", f"recording_{int(time.time())}.mp4")
+                file_name = f"recording_{int(time.time())}.mp4"
+                self.filesink.set_property("location", file_name)
+                print(f"Started streaming and recording to {file_name}")
+            else:
+                print("Error: Filesink not found in pipeline")
+
             bus = self.pipeline.get_bus()
             bus.add_signal_watch()
             self.loop = GLib.MainLoop()
@@ -89,57 +92,26 @@ class CameraStreamer:
         except Exception as e:
             print(f"Error: {e}")
         finally:
-            if self.pipeline:
-                self.pipeline.set_state(Gst.State.NULL)
+            self.stop_stream()  # Ensure proper cleanup
 
     def stop_stream(self):
         """
-        Stops the camera stream.
+        Stops the camera stream and recording.
 
-        This method stops the camera stream by setting the GStreamer pipeline
-        to the NULL state and quitting the main loop. If the pipeline is not
-        running, this method does nothing.
+        This method stops the camera stream by sending an EOS event to the pipeline,
+        ensuring the recording is finalized properly, then setting the pipeline to NULL state.
 
         :return: None
         """
         if self.pipeline:
+            # Send EOS to ensure the recording is finalized
+            self.pipeline.send_event(Gst.Event.new_eos())
+            # Wait for EOS to propagate (give some time for mp4mux to finalize the file)
+            time.sleep(1)
             self.pipeline.set_state(Gst.State.NULL)
+            print("Stopped streaming and recording")
+            if self.filesink:
+                file_path = self.filesink.get_property("location")
+                print(f"Recording saved to {file_path}")
         if self.loop and self.loop.is_running():
             self.loop.quit()
-
-    def start_recording(self):
-        """
-        Starts recording the camera stream to a file.
-
-        This method sets the recording flag to True and updates the filesink location
-        to a new file with a timestamp in the name.
-
-        :return: None
-        """
-        if not self.recording and self.pipeline:
-            self.recording = True
-            if self.filesink:
-                self.filesink.set_property("location", f"recording_{int(time.time())}.mp4")
-                print(f"Started recording to recording_{int(time.time())}.mp4")
-            else:
-                print("Error: Filesink not found in pipeline")
-
-    def stop_recording(self):
-        """
-        Stops recording the camera stream.
-
-        This method sets the recording flag to False and resets the pipeline to start a new file
-        for the next recording.
-
-        :return: None
-        """
-        if self.recording and self.pipeline:
-            self.recording = False
-            print("Stopped recording")
-            # Reset pipeline to prepare for the next recording
-            self.pipeline.set_state(Gst.State.NULL)
-            self.pipeline.set_state(Gst.State.PLAYING)
-
-if __name__ == "__main__":
-    streamer = CameraStreamer()
-    streamer.start_stream()
