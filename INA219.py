@@ -299,15 +299,15 @@ class INA219:
         return (self.read(_REG_BUSVOLTAGE) >> 3) * 0.004
 
     def getCurrent_mA(self):
-    """
-    Returns the current flowing through the shunt resistor.
+        """
+        Returns the current flowing through the shunt resistor.
 
-    The current is read from the CURRENT register, adjusted for overflow,
-    and scaled by the current LSB value.
+        The current is read from the CURRENT register, adjusted for overflow,
+        and scaled by the current LSB value.
 
-    Returns:
-        float: The current in milliamperes (mA).
-    """
+        Returns:
+            float: The current in milliamperes (mA).
+        """
 
         value = self.read(_REG_CURRENT)
         if value > 32767:
