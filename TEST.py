@@ -1,4 +1,4 @@
-from CAMERA import CameraStreamer
+from CAMERA2 import CameraStreamer
 from CONTROLLER import AutoCarController
 import threading
 from INA219 import INA219  # Import INA219 class
